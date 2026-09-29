@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shimla Slice Solan - Billing System (Solan)</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #f7f7f7;
+      display: flex;
+      height: 100vh;
+    }
+   
+
+
+    .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100px;   /* wider to fit images */
+  height: 100%;
+  background: #fff;
+  border-right: 1px solid #ddd;
+  padding: 15px 10px;
+  overflow-y: auto;
+}
+
+.sidebar a {
+  display: flex;
+  flex-direction: column;  /* image on top, text below */
+  align-items: center;
+  margin-bottom: 15px;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.sidebar a img {
+  width: 60%;
+  height: 60px;  /* adjust height */
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+
+.sidebar a span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #ff4800;
+  text-align: center;
+}
+
+.sidebar a:hover {
+  transform: scale(1.05);
+}
+
+    /* Layout */
+    .menu {
+      flex: 2;
+      padding: 120px;
+      overflow-y: auto;
+    }
+    .category {
+      margin-bottom: 30px;
+    }
+    .category h2 {
+      color: #ff4800;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 5px;
+    }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 15px;
+    }
+    .menu-item {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: all .2s ease;
+      text-align: center;
+    }
+    .menu-item:hover { transform: scale(1.05); }
+    .menu-item img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+    }
+    .menu-item .info {
+      padding: 10px;
+    }
+    .menu-item .info h4 {
+      margin: 0;
+      font-size: 15px;
+      color: #333;
+    }
+    .menu-item .info span {
+      font-weight: bold;
+      color: #ff4800;
+    }
+    .sizes {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  gap: 5px;
+}
+
+.sizes button {
+  flex: 1;
+  background: #ff4800;
+  border: none;
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.sizes button:hover {
+  background: #e13e00;
+}
+
+.sizes button:active {
+  transform: scale(0.95);
+}
+
+
+    /* Bill Section */
+    .bill {
+      flex: 1;
+      background: #fff;
+      padding: 20px;
+      border-left: 2px solid #eee;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-y: auto;
+    }
+.bill h2 {
+  text-align: center;
+  color: #ff4800;
+  margin-bottom: 15px;
+  font-size: 20px;
+
+}
+
+.bill-box {
+  background: #fafafa;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+
+    .bill input {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+.order-type {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+
+
+    #bill-items div {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px;
+      border-bottom: 1px solid #eee;
+    }
+    .item-controls {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .item-controls button {
+      background: #ff4800;
+      border: none;
+      color: #fff;
+      padding: 3px 7px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .total {
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 10px;
+      text-align: right;
+    }
+    button.action {
+      background: #ff4800;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    button.action:hover { background: #e13e00; }
+
+    /* Printable */
+    .printable { display: none; }
+    @media print {
+      body * { visibility: hidden; }
+      .printable, .printable * { visibility: visible; }
+      .printable { position: absolute; left: 0; top: 0; width: 72mm; }
+    }
+  </style>
+</head>
+<body>
+   <div class="sidebar">
+  <a href="#burgers">
+    <img src="https://fat-tiger.in/wp-content/uploads/2022/08/swiggy_0012_Aloo-Tikki-Burger-scaled.jpg" alt="Burgers">
+    <span>Burgers</span>
+  </a>
+    <a href="#cold-Drink">
+    <img src="https://jainslittleindia.com/wp-content/uploads/2023/11/can-pepsi-1.webp" alt="cold-Drink">
+    <span>Cold-Drink</span>
+    </a>
+  
+  <a href="#cold-coffe">
+    <img src="https://mortadellahead.com/wp-content/uploads/2023/04/cold-brew-mocha-recipe.png" alt="Cold Coffe">
+    <span>Cold Coffe</span>
+  </a>
+  <a href="#pizza">
+    <img src="https://api.allonaya.ma/assets/files/Media/Q4qREKHbXGMraByKy/image/MARGARITA.jpg" alt="Wrap">
+    <span>Veg1 Pizza</span>
+  </a>
+  <a href="#specials">
+    <img src="https://content.jdmagicbox.com/comp/def_content/pizza_outlets/default-pizza-outlets-13.jpg" alt="Wrap">
+    <span>Shimla spl Pizza</span>
+  </a>
+ 
+  </a>
+   <a href="#extras">
+    <img src="https://png.pngtree.com/png-clipart/20250103/original/pngtree-extra-cheesy-pizza-slice-png-image_19009263.png" alt="Extra">
+    <span>Extra Cheese</span>
+  </a>
+</div>
+
+
+
+
+<!-- Menu Section -->
+<div class="menu">
+    <!-- Burgers -->
+  <div class="category" id="burgers">
+    <h2>🍔 Burgers</h2>
+    <div class="menu-grid">
+      <div class="menu-item" onclick="addToOrder('Veggie Burger',79)">
+        <img src="https://vendor.buysab.com/uploads/4e45e0f188aec35f739b6105d5f8ff4f.jpg" alt="">
+        <div class="info"><h4>Veggie Burger</h4><span>₹79</span></div>
+      </div>
+      <div class="menu-item" onclick="addToOrder('Cheesy Veggie Burger',99)">
+        <img src="https://www.crazycheesy.com/wp-content/uploads/2023/01/VEG-CHEESE-BURGER-1.jpg" alt="">
+        <div class="info"><h4>Cheesy Veggie Burger</h4><span>₹99</span></div>
+      </div>
+    </div>
+  </div>
+  <!-- 🍕 Pizza Section -->
+<div class="category" id="pizza">
+  <h2>🍕 Veg 1. Pizza</h2>
+  <div class="menu-grid">
+
+    <!-- Margherita -->
+    <div class="menu-item">
+      <img src="https://api.allonaya.ma/assets/files/Media/Q4qREKHbXGMraByKy/image/MARGARITA.jpg" alt="Margherita">
+      <div class="info">
+        <h4>Margherita</h4>
+        <div class="sizes">
+          <button onclick="addPizza('Margherita','Regular',162)">R ₹162</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Makhani Paneer -->
+    <div class="menu-item">
+      <img src="https://dj4f9j4jaohr.cloudfront.net/filters:format(webp)/fit-in/600x600/HiMenus/Uploads/MenuImages/6c6e6bf0-bc26-486b-a91b-5798053c43d2-133378556502444820.jpg" alt="Makhani Paneer">
+      <div class="info">
+        <h4>Makhani Paneer</h4>
+        <div class="sizes">
+          <button onclick="addPizza('Makhani Paneer','Regular',182)">R ₹182</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Farm Fresh -->
+    <div class="menu-item">
+      <img src="https://blog.pizzatwist.com/wp-content/uploads/2025/01/Vegetarianchicagopizza-1024x768.jpg" alt="Farm Fresh">
+      <div class="info">
+        <h4>Farm Fresh</h4>
+        <div class="sizes">
+          <button onclick="addPizza('Farm Fresh','Regular',179)">R ₹179</button>
+         
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- Shimla Slice Specials -->
+<div class="category" id="specials">
+  <h2>⭐ Shimla Slice Specials</h2>
+  <div class="menu-grid">
+    <div class="menu-item">
+      <img src="https://foodoncall.co.in/wp-content/uploads/2017/10/chatpata-paneer-pizza.jpg" alt="Makhani Pahadi Paneer">
+      <div class="info">
+        <h4>Shimla Slice Specials</h4>
+        <div class="sizes">
+          <button onclick="addPizza('Shimla Slice Specials','Regular',249)">R ₹249</button>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Extra Cheese & Toppings -->
+<div class="category" id="extras">
+  <h2>🧀 Extra Toppings</h2>
+  <div class="menu-grid">
+    <div class="menu-item">
+      <img src="https://png.pngtree.com/png-clipart/20250103/original/pngtree-extra-cheesy-pizza-slice-png-image_19009263.png" alt="Extra Cheese">
+      <div class="info">
+        <h4>Extra Cheese</h4>
+        <span>R ₹48</span>
+        <button onclick="addToOrder('Extra Cheese (R)',48)">R</button>
+      </div>
+      <div class="info">
+        <h4>Extra Topping</h4>
+        <span>R ₹30</span>
+        <button onclick="addToOrder('Extra Topping (R)',30)">R</button>
+      </div>
+      </div>
+  </div>
+</div>
+
+
+
+  <!-- Cold Coffe -->
+<div class="category" id="cold-coffe">
+    <h2>🥤 Cold Coffe</h2>
+    <div class="menu-grid">
+      <div class="menu-item" onclick="addToOrder('Cold Coffe',99)">
+        <img src="https://img.freepik.com/premium-photo/iced-coffee-roasted-coffee-wood-table_36078-57.jpg?semt=ais_hybrid&w=740&q=80" alt="cold-coffe">
+        <div class="info"><h4>Cold Coffe</h4><span>₹99</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cold Beverages -->
+<div class="category" id="cold-Drink">
+    <h2>🥤 Cold Beverages</h2>
+    <div class="menu-grid">
+      <div class="menu-item" onclick="addToOrder('Cane pepsi ',70)">
+        <img src="https://jainslittleindia.com/wp-content/uploads/2023/11/can-pepsi-1.webp" alt="">
+        <div class="info"><h4>Cane pepsi </h4><span>₹70</span></div>
+      </div>
+      <div class="menu-item" onclick="addToOrder('Cane sprite ',70)">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQf50nISnDhIXKabeM1Hj21MxZPP-nZQhMLOQ&s" alt="">
+        <div class="info"><h4>Cane sprite </h4><span>₹70</span></div>
+      </div>
+      <div class="menu-item" onclick="addToOrder('Cane coke ',70)">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJD118ErXGDN7O0-b_e56F3xjdtyVb8zgcQg&s" alt="">
+        <div class="info"><h4>Cane coke </h4><span>₹70</span></div>
+      </div>
+      <div class="menu-item" onclick="addToOrder('Cane due ',70)">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQt9sHgp0vI1jEk2eFIDK3UAvyd51GjrcpR9w&s" alt="">
+        <div class="info"><h4>Cane due </h4><span>₹70</span></div>
+      </div>
+      <div class="menu-item" onclick="addToOrder('Cane Limca ',70)">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo1cbL3pcc7E27iZ-53iLX7yul8pHPc7uVLw&s" alt="">
+        <div class="info"><h4>Cane Limca </h4><span>₹70</span></div>
+      </div>
+      <div class="menu-item" onclick="addToOrder('Cane Diet Coke ',70)">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJv-VoUbfym0U8uMaSUrRmo5_HW7xMCt6r0A&s" alt="">
+        <div class="info"><h4>Cane Diet coke </h4><span>₹70</span></div>
+      </div>
+      <div class="menu-item" onclick="addToOrder('Cane Zero Sugar pepsi ',70)">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQY2-wH1t6nY_ImlXcP1INR7JaClM0Pby2UBg&s" alt="">
+        <div class="info"><h4>Cane  Zero Sugar pepsi </h4><span>₹70</span></div>
+      </div>
+    
+      <div class="menu-item" onclick="addToOrder('Cane Fanta  ',70)">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTthRfeTh85mOGVBOQ1VBL3xCCw7xjujy9cug&s" alt="">
+        <div class="info"><h4>Cane Fanta </h4><span>₹70</span></div>
+      </div>
+      <div class="menu-item" onclick="addToOrder('Cane 7 UP ',70)">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRU4FnqVBxzt73eEqqcA2FX0K-w1KD8hymn3Q&s" alt="">
+        <div class="info"><h4> Cane 7 UP </h4><span>₹70</span></div>
+      </div>
+       <div class="menu-item" onclick="addToOrder('Cane Sting  ',40)">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQasJlldEjrX19troH_-NtbZMvXtcL_POQrEQ&s" alt="">
+        <div class="info"><h4> Cane Sting </h4><span>₹40</span></div>
+      </div>
+    </div>
+  </div>
+ 
+
+
+
+
+</div>
+
+<!-- Bill Section -->
+<div class="bill">
+  <div>
+    <h2>🧾 Customer Bill</h2>
+
+    <!-- Order Options -->
+    <div class="bill-box">
+      <h3>⚙️ Order Options</h3>
+      <label style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+        <input type="checkbox" id="bogoToggle" onchange="toggleBogo()"> 
+        🎁 Buy One Get One (Medium & Large)
+      </label>
+      <div class="order-type">
+        <label><input type="radio" name="orderType" value="Dine-In" checked> 🍽️ Dine-In</label>
+        <label><input type="radio" name="orderType" value="Takeaway"> 🛍️ Takeaway</label>
+        <label><input type="radio" name="orderType" value="Delivery"> 🚚 Delivery</label>
+      </div>
+    </div>
+
+    <!-- Customer Info -->
+    <div class="bill-box">
+      <h3>👤 Customer Info</h3>
+      <input type="text" id="custName" placeholder="Enter Customer Name">
+      <input type="text" id="custPhone" placeholder="Enter Phone Number">
+    </div>
+
+    <!-- Bill Items -->
+    <div class="bill-box">
+      <h3>🛒 Items</h3>
+      <div id="bill-items"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="bill-footer">
+    <div class="total">Total: ₹<span id="total">0</span></div>
+    <div class="actions">
+      <button class="action print" onclick="printBill()">🖨️ Print Bill & KOT</button>
+      <button class="action cancel" onclick="cancelOrder()">❌ Cancel Order</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Printable -->
+<div id="print-area" class="printable"></div>
+
+<script>
+let order = {};
+let bogoActive = false;
+let bogoBuffer = null;
+let bogoEnabled = false;
+
+// ---------------- BOGO Toggle ----------------
+function toggleBogo() {
+  bogoEnabled = document.getElementById("bogoToggle").checked;
+  if (!bogoEnabled) { bogoActive = false; bogoBuffer = null; }
+}
+
+// ---------------- Add Items ----------------
+function addPizza(name, size, price) {
+  if (bogoEnabled && (size==="Medium" || size==="Large")) {
+    if (!bogoActive) {
+      bogoActive = true; bogoBuffer = { name, size, price };
+      alert(`🎁 BOGO Activated!\nNow select your second ${size} pizza.`); 
+      return;
+    } else if (bogoBuffer) {
+      let paid, free;
+      if (price >= bogoBuffer.price) {
+        paid = { name, size, price };
+        free = { name:bogoBuffer.name, size:bogoBuffer.size, price:0 };
+      } else {
+        paid = { name:bogoBuffer.name, size:bogoBuffer.size, price:bogoBuffer.price };
+        free = { name, size, price:0 };
+      }
+      addItemToBill(`${paid.name} (${paid.size})`, paid.price);
+      addItemToBill(`${free.name} (${free.size}) FREE`, 0);
+      bogoActive = false; bogoBuffer = null; updateBill(); 
+      return;
+    }
+  }
+  addItemToBill(`${name} (${size})`, price);
+  updateBill();
+}
+function addToOrder(name, price) { addItemToBill(name, price); updateBill(); }
+function addItemToBill(itemName, price) { 
+  if (order[itemName]) order[itemName].qty++; 
+  else order[itemName] = { price, qty: 1 }; 
+}
+
+// ---------------- Bill Updates ----------------
+function updateBill() {
+  const billDiv = document.getElementById("bill-items"); 
+  billDiv.innerHTML = ""; 
+  let total = 0;
+  Object.keys(order).forEach(item => {
+    let {price, qty} = order[item]; 
+    let itemTotal = price*qty; 
+    total += itemTotal;
+    billDiv.innerHTML += `
+      <div>
+        <span>${item} (${qty}x)</span>
+        <div class="item-controls">
+          <span>₹${itemTotal}</span>
+          <button onclick="changeQty('${item}',-1)">-</button>
+          <button onclick="changeQty('${item}',1)">+</button>
+          <button onclick="removeItem('${item}')">🗑️</button>
+        </div>
+      </div>`;
+  });
+  document.getElementById("total").innerText = total;
+}
+function changeQty(item, delta) { 
+  order[item].qty += delta; 
+  if (order[item].qty<=0) delete order[item]; 
+  updateBill(); 
+}
+function removeItem(item) { delete order[item]; updateBill(); }
+function cancelOrder() { 
+  if (confirm("Cancel order?")) { 
+    order = {}; updateBill(); 
+  } 
+}
+
+// ---------------- Google Sheets Sync ----------------
+function sendToGoogleSheet(orderData) {
+  try {
+    fetch("https://script.google.com/macros/s/AKfycbw9SaS2qx54rsSevp1yqMeuF9RwPcZERPmFlQUOFPXG-JuzFQDG_babN7qPjXvWJ3FZMQ/exec", {
+      method: "POST",
+      mode: "no-cors",   // 🔥 VERY IMPORTANT
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(orderData)
+    });
+
+    console.log("✅ Data Sent to Google Sheet");
+
+  } catch (error) {
+    console.error("❌ Error sending data:", error);
+  }
+}
+
+// ---------------- Print Receipts ----------------
+function printBill() {
+  const name = document.getElementById("custName").value || "Guest";
+  const phone = document.getElementById("custPhone").value || "-";
+  const orderType = document.querySelector('input[name="orderType"]:checked')?.value || "Dine-In";
+  const now = new Date().toLocaleString();
+  const billNo = Date.now(); // ✅ Bill No generated
+  let total=0, kotTable="", billTable="";
+
+  Object.keys(order).forEach(item => {
+    let {price, qty} = order[item], lineTotal=price*qty; 
+    total+=lineTotal;
+    kotTable += `<tr><td style="font-weight:bold;">${item}</td><td style="text-align:center;">x${qty}</td></tr>`;
+    billTable += `<tr><td>${item}</td><td style="text-align:center;">${qty}</td><td style="text-align:right;">₹${price}</td><td style="text-align:right;">₹${lineTotal}</td></tr>`;
+  });
+
+  // 🔹 Kitchen Order Ticket (Added Bill No)
+  const kotHTML = `<div style="width:78mm; font-family:monospace; font-size:13px;">
+      <h3 style="text-align:center;">🍴 KOT</h3>
+      <p><b>Bill No:</b> ${billNo}</p>
+      <p><b>Customer:</b> ${name} (${phone})</p>
+      <p>${now}<br><b>Type:</b> ${orderType}</p>
+      <table style="width:100%; font-size:13px;"><tbody>${kotTable}</tbody></table>
+      <hr><p style="text-align:right;"><b>Total: ₹${total}</b></p>
+    </div>`;
+
+  // 🔹 Customer Bill (Added Bill No)
+  const billHTML = `<div style="width:78mm; font-family:monospace; font-size:12px;">
+      <h3 style="text-align:center;">Shimla Slice Solan</h3>
+      <h3 style="text-align:center;">8091915022</h3>
+      <p style="text-align:center; font-size:11px;">${now}</p><hr>
+      <p><b>Bill No:</b> ${billNo}</p>
+      <p><b>Customer:</b> ${name} (${phone})</p>
+      <p><b>Order Type:</b> ${orderType}</p>
+      <table style="width:100%; font-size:12px; border-collapse:collapse;">
+        <tr><th style="text-align:left;">Item</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Price</th><th style="text-align:right;">Amt</th></tr>
+        ${billTable}
+        <tr style="border-top:1px solid #000; font-weight:bold;">
+          <td colspan="3" style="text-align:right;">Total</td>
+          <td style="text-align:right;">₹${total}</td>
+        </tr>
+      </table>
+      <p style="text-align:center; margin-top:10px;">🙏 Thank You! Visit Again</p>
+    </div>`;
+
+  // ✅ Helper to print hidden iframe
+  function printHTML(html) {
+    const iframe=document.createElement("iframe");
+    iframe.style.position="fixed"; 
+    iframe.style.width="0"; 
+    iframe.style.height="0"; 
+    iframe.style.border="0";
+    document.body.appendChild(iframe);
+    const doc=iframe.contentDocument||iframe.contentWindow.document;
+    doc.open(); doc.write(html); doc.close();
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+    setTimeout(()=>document.body.removeChild(iframe),2000);
+  }
+
+  // ✅ Print KOT first, then Bill after 2s
+  printHTML(kotHTML);
+  setTimeout(()=>printHTML(billHTML),2000);
+
+  // ✅ Save to Google Sheets
+  sendToGoogleSheet({ 
+    billNo: billNo, 
+    dateTime: now, 
+    customerName: name, 
+    customerPhone: phone, 
+    orderType: orderType,
+    items: Object.keys(order).map(i=>({ 
+      name:i, qty:order[i].qty, price:order[i].price, amount:order[i].price*order[i].qty 
+    })),
+    total: total 
+  });
+}
+
+// ---------------- Custom Function ----------------
+function myFunction() {
+  alert("Custom function is working!");
+}
+</script>
+
+</body>
+</html>
